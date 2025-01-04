@@ -31,13 +31,13 @@ then
     exit 1
 fi 
 
-dnf install mysql-server -y &>>$OG_FILE_NAME
+dnf install mysql-server -y &>>$LOG_FILE_NAME
 VALIDATE $? "installing mysql"
 
-systemctl enable mysqld &>>$OG_FILE_NAME
+systemctl enable mysqld &>>$LOG_FILE_NAME
 VALIDATE $? "enabling mysql-server"
 
-systemctl start mysqld &>>$OG_FILE_NAME
+systemctl start mysqld &>>$LOG_FILE_NAME
 VALIDATE $? "starting mysql-server"
 
 mysql -h mysql.durgam.online -u root -pExpenseApp@1 -e 'show databases;'
