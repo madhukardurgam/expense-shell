@@ -7,7 +7,7 @@ N="\e[0m"
 LOG_PATH="/var/log/expense-logs"
 LOG_FILE="(echo $0 | cut -d "." -1f)"
 TIMESTAMP="($date +%Y-%m-%d-%H-%M-%S)"
-LOG_FILE_NAME="($LOG_PATH/$LOG_FILE-$TIMESTAMP.log)"
+LOG_FILE_NAME="$LOG_PATH/$LOG_FILE-$TIMESTAMP.log"
 
 CHECK_ROOT(){
     if [ $USERID -ne 0 ]
