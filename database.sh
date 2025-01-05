@@ -1,51 +1,47 @@
 #!/bin/bash
-#installing the sql and git with reduced no of lines
 USERID=$(id -u)
-#color coding
 R="\e[31m"
 G="\e[32m"
 Y="\e[33m"
-N="\e[0m"
-#path to store the logs
-LOGS_FOLDER="/var/log/expense-logs"
-#name of the file
-LOG_FILE="$(echo $0 | cut -d "." -f1)"
-#timestamp of execution
-TIMESTAMP=$(date +%Y-%m-%d-%H-%M-%S)
-#full logfile name
-LOG_FILE_NAME="$LOGS_FOLDER/$LOG_FILE-$TIMESTAMP.log"
+R="\e[0m"
+LOG_PATH="/var/log/expense-logs"
+LOG_FILE="(echo $0 | cut -d "." -f1)"
+TIMESTAMP="($date +%Y-%m-%d-%H-%M-%S)"
+LOG_FILE_NAME="($OG_PATH/$LOG_FILE-$TIMESTAMP.log)"
 
+CHECK_ROOT(){
+    if [ $USERID -ne 0 ]
+    then
+        echo "you need sudo access to run the script"
+        exit 1
+    fi  
+}
 VALIDATE(){
     if [ $1 -ne 0 ]
-    then
-        echo -e "$2..... $R failure $N"
+    then 
+        echo -e "$2 ..... $R FAILURE $N"
         exit 1
     else
-        echo -e "$2..... $G success $N"
-    fi
+        echo -e "$2 ..... $G SUCCESS $N"
 }
+echo "script started executing at: $TIMESTAMP "
+CHECK_ROOT
 
-if [ $USERID -ne 0 ]
-then 
-    echo "you do not have the root access to run the script"
-    exit 1
-fi 
+dnf install mysql-server -y
+VALIDATE $? "installing mysql-server"
 
-dnf install mysql-server -y &>>$LOG_FILE_NAME
-VALIDATE $? "installing mysql"
-
-systemctl enable mysqld &>>$LOG_FILE_NAME
+systemctl enable mysqld
 VALIDATE $? "enabling mysql-server"
 
-systemctl start mysqld &>>$LOG_FILE_NAME
+systemctl start mysqld
 VALIDATE $? "starting mysql-server"
 
-mysql -h mysql.durgam.online -u root -pExpenseApp@1 -e 'show databases;' $LOG_FILE_NAME
-
+mysql -h data.durgam.online -u root -p ExpenseApp@1 -e 'show databases;'
 if [ $? -ne 0 ]
 then 
-    mysql_secure_installation --set-root-pass ExpenseApp@1 $LOG_FILE_NAME
-    VALIDATE $? "Setting Root Password"
+    mysql_secure_installation --set-root-pass ExpenseApp@1
+    VALIDATE $? "setting root password"
 else
-    echo -e "setting the root password already setup... $Y SKIPPING $N"
+    echo -e "mysql root password is already setup... $Y SKIPPING $N "
 fi
+
